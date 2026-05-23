@@ -76,7 +76,7 @@ func (d *Detector) Analyze(ctx context.Context, result checker.Result) {
 				ErrorMessage: result.Error,
 				SentAt:       time.Now(),
 			}
-			_ = d.dispatcher.Dispatch(ctx, al)
+			_ = d.dispatcher.Send(ctx, al)
 		} else {
 			_ = result.CheckedAt.Sub(activeIncident.StartedAt)
 		}
@@ -97,7 +97,7 @@ func (d *Detector) Analyze(ctx context.Context, result checker.Result) {
 			TotalDowntime:   fmt.Sprintf("%d minutes", int(downtime.Minutes())),
 			SentAt:          time.Now(),
 		}
-		_ = d.dispatcher.Dispatch(ctx, al)
+		_ = d.dispatcher.Send(ctx, al)
 		return
 	}
 
@@ -125,7 +125,7 @@ func (d *Detector) Analyze(ctx context.Context, result checker.Result) {
 					NormalLatencyMs: int64(mean),
 					SentAt:          time.Now(),
 				}
-				_ = d.dispatcher.Dispatch(ctx, al)
+				_ = d.dispatcher.Send(ctx, al)
 			}
 		}
 	}
