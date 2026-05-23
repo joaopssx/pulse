@@ -6,7 +6,6 @@ import (
 	"time"
 
 	"github.com/pulse/pulse/internal/alert"
-	"github.com/pulse/pulse/internal/anomaly"
 	"github.com/pulse/pulse/internal/models"
 )
 
@@ -14,16 +13,20 @@ type Store interface {
 	SaveCheckResult(ctx context.Context, result Result) error
 }
 
+type AnomalyDetector interface {
+	Analyze(ctx context.Context, result Result)
+}
+
 type Scheduler struct {
 	services   []models.Service
 	store      Store
 	dispatcher alert.Dispatcher
-	detector   anomaly.Detector
+	detector   AnomalyDetector
 	wg         sync.WaitGroup
 	cancel     context.CancelFunc
 }
 
-func NewScheduler(services []models.Service, store Store, dispatcher alert.Dispatcher, detector anomaly.Detector) *Scheduler {
+func NewScheduler(services []models.Service, store Store, dispatcher alert.Dispatcher, detector AnomalyDetector) *Scheduler {
 	return &Scheduler{
 		services:   services,
 		store:      store,
