@@ -13,7 +13,7 @@ bot/src/**/__pycache__/
 .venv/
 venv/
 
-# Env files (NUNCA sobe isso)
+# Env files
 .env
 bot/.env
 
