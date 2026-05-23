@@ -55,17 +55,23 @@ func (s *Scheduler) runService(ctx context.Context, service models.Service) {
 	ticker := time.NewTicker(service.Interval)
 	defer ticker.Stop()
 
+	s.runCheck(ctx, chk)
+
 	for {
 		select {
 		case <-ctx.Done():
 			return
 		case <-ticker.C:
-			res := chk.Check(ctx)
-			_ = s.store.SaveCheckResult(ctx, res)
-			if s.detector != nil {
-				s.detector.Analyze(ctx, res)
-			}
+			s.runCheck(ctx, chk)
 		}
+	}
+}
+
+func (s *Scheduler) runCheck(ctx context.Context, chk *Checker) {
+	res := chk.Check(ctx)
+	_ = s.store.SaveCheckResult(ctx, res)
+	if s.detector != nil {
+		s.detector.Analyze(ctx, res)
 	}
 }
 

@@ -77,8 +77,6 @@ func (d *Detector) Analyze(ctx context.Context, result checker.Result) {
 				SentAt:       time.Now(),
 			}
 			_ = d.dispatcher.Send(ctx, al)
-		} else {
-			_ = result.CheckedAt.Sub(activeIncident.StartedAt)
 		}
 		return
 	}

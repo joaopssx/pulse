@@ -21,12 +21,16 @@ type Store struct {
 }
 
 func New(path string) (*Store, error) {
-	db, err := sql.Open("sqlite3", path)
+	dsn := path + "?_journal_mode=WAL&_busy_timeout=5000&_synchronous=NORMAL"
+	db, err := sql.Open("sqlite3", dsn)
 	if err != nil {
 		return nil, err
 	}
 
+	db.SetMaxOpenConns(1)
+
 	if _, err := db.Exec(initSQL); err != nil {
+		db.Close()
 		return nil, err
 	}
 

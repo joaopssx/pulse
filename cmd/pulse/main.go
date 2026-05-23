@@ -25,7 +25,7 @@ func main() {
 	slog.SetDefault(logger)
 
 	configPath := flag.String("config", "config.yaml", "")
-	port := flag.Int("port", 8080, "")
+	port := flag.Int("port", 0, "")
 	flag.Parse()
 
 	cfg, err := config.Load(*configPath)
@@ -74,12 +74,17 @@ func main() {
 		})
 	}
 
+	dashPort := cfg.Dashboard.Port
+	if *port != 0 {
+		dashPort = *port
+	}
+
 	scheduler := checker.NewScheduler(services, store, multiDispatcher, detector)
-	dashServer := dashboard.New(*port, store, services)
+	dashServer := dashboard.New(dashPort, store, services)
 
 	slog.Info("starting pulse",
 		slog.Int("services_count", len(services)),
-		slog.Int("dashboard_port", *port),
+		slog.Int("dashboard_port", dashPort),
 		slog.String("bot_endpoint", cfg.Alerts.Bot.Endpoint),
 	)
 
