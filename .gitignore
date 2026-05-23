@@ -1,0 +1,28 @@
+# Go
+go/bin/
+go/*.exe
+go/pulse
+*.db
+
+# Python
+bot/__pycache__/
+bot/src/__pycache__/
+bot/src/**/__pycache__/
+*.pyc
+*.pyo
+.venv/
+venv/
+
+# Env files (NUNCA sobe isso)
+.env
+bot/.env
+
+# SQLite
+*.db
+*.sqlite
+data/
+
+# IDE
+.vscode/
+.idea/
+*.DS_Store
