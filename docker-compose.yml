@@ -1,0 +1,49 @@
+services:
+  pulse:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: pulse
+    restart: unless-stopped
+    user: "10001:10001"
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./config.yaml:/app/config.yaml:ro
+      - ./data:/app/data
+    environment:
+      CONFIG_PATH: /app/config.yaml
+      BOT_ENDPOINT: http://pulse-bot:5000
+      BOT_SECRET: ${PULSE_SECRET:-}
+    networks:
+      - pulse-net
+    healthcheck:
+      test: ["CMD", "wget", "-q", "--spider", "http://localhost:8080/health"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
+
+  pulse-bot:
+    build:
+      context: ./bot
+      dockerfile: Dockerfile
+    container_name: pulse-bot
+    restart: unless-stopped
+    user: "10001:10001"
+    ports:
+      - "5000:5000"
+    env_file:
+      - ./bot/.env
+    environment:
+      PULSE_API_URL: http://pulse:8080
+      BOT_PORT: "5000"
+    networks:
+      - pulse-net
+    depends_on:
+      pulse:
+        condition: service_healthy
+
+networks:
+  pulse-net:
+    driver: bridge

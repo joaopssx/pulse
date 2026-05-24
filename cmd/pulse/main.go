@@ -24,7 +24,12 @@ func main() {
 	logger := slog.New(slog.NewTextHandler(os.Stdout, nil))
 	slog.SetDefault(logger)
 
-	configPath := flag.String("config", "config.yaml", "")
+	defaultConfig := os.Getenv("CONFIG_PATH")
+	if defaultConfig == "" {
+		defaultConfig = "config.yaml"
+	}
+
+	configPath := flag.String("config", defaultConfig, "")
 	port := flag.Int("port", 0, "")
 	flag.Parse()
 
@@ -32,6 +37,13 @@ func main() {
 	if err != nil {
 		slog.Error("failed to load config", "error", err)
 		os.Exit(1)
+	}
+
+	if v := os.Getenv("BOT_ENDPOINT"); v != "" {
+		cfg.Alerts.Bot.Endpoint = v
+	}
+	if v := os.Getenv("BOT_SECRET"); v != "" {
+		cfg.Alerts.Bot.Secret = v
 	}
 
 	valErrs := config.Validate(cfg)
